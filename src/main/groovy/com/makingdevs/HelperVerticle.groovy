@@ -2,6 +2,18 @@ package com.makingdevs
 
 def eb = vertx.eventBus()
 
+//Consumer para decodificar base64
+eb.consumer("com.makingdevs.emailer.decode"){ encode ->
+  def decode = encode.body().decodeBase64()
+  def messageDecode = new String(decode)
+  def dataLogin = messageDecode.split(":")
+  def credentials=[
+    username:dataLogin[0].toString(),
+    password:dataLogin[1].toString()
+  ]
+  encode.reply(credentials)
+}
+
 //Verify Params at service call
 //Recibe: [:] con parámetros para armar el email
 //Salida: ok si están los suficientes, [:] errores de campos que hacen falta

@@ -16,7 +16,7 @@ def eb = vertx.eventBus()
 //Salida: Reply de confirmado
 eb.consumer("com.makingdevs.emailer.sender", { message ->
   def mail=message.body()
-  def response="Hemos enviado lo siguiente:\n ID:"+message.body().id+".\n DESTINATARIO: "+message.body().to+"\n SUBJECT: "+message.body().subject
+  def response="Emailer "+message.body().id+" enviado a "+message.body().to
 
   if(message.body().cc) {
     mail.cc=message.body().cc

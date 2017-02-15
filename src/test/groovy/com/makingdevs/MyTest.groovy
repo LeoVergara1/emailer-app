@@ -67,6 +67,18 @@ suite.before({ context ->
     context.assertEquals(responseTest, response.result.body())
     async.complete()
   }
+}).test("verificationEncoderAuth",{ context ->
+  def async = context.async()
+  def credentialsExample=[
+    username:"admin",
+    password:"admin"
+  ]
+  def encodeMessage="YWRtaW46YWRtaW4="
+  vertx.eventBus().send("com.makingdevs.emailer.decode", encodeMessage) { response ->
+    def credentialsDecode = response.result().body()
+    context.assertEquals(credentialsExample, credentialsDecode)
+    async.complete()
+  }
 }).after({ context ->
   println "Terminando las pruebas"
 })

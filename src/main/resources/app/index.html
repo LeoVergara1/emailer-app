@@ -238,7 +238,7 @@
       <div class="nav-wrapper container">
         <span class="brand-logo black-text cursive"><b>Emailer App</span>
         <ul class="right black-text font">
-          <li><a href="#">Inicio</a></li>
+          <li><a href="#">Información</a></li>
           <li><a href="#/newEmailer"><i class="material-icons right">mode_edit</i>Nuevo Emailer</a></li>
           <li><a href="#/readEmailers"><i class="material-icons right">library_books</i>Almacén de Emailers</a></li>
           <li><a href="/logout">Salir</a></li>
@@ -257,42 +257,43 @@
          <br>
          <h1 class="header center red-text lighten-2">Emailer App</h1>
          <div class="row center">
-          <h5 class="header col s12 light font">Cómo Funciona</h5>
+          <h5 class="header col s12 light font">Versión 2</h5>
          </div>
 
          <div class="row">
            <div class="col s12 m4">
              <div class="icon-block">
-               <h2 class="center light-blue-text darken-4"><i class="medium material-icons">markunread_mailbox</i></h2>
-               <h5 class="center font">Aplicación Web</h5>
-               <p class="light">Ingresa y agrega un emailer nuevo, consulta los emailers anteriores, y haz una prueba de envío. Para su implementación con otra aplicación consulte a su Web Master. </p>
+               <h2 class="center light-blue-text darken-4"><i class="medium material-icons">mode_edit</i></h2>
+               <h5 class="center font">Nuevo Emailer</h5>
+               <p class="light"> Agrega aquí un título al emailer, y escribe el contenido, donde quieras agregar un campo dinámico hazlo de la siguiente manera: <b>${nombre}</b>.</p>
+               <p class="light">"Saludos ${apellidoPaterno}, ${nombre}. Atiende lo siguiente ${mensaje}"</p>
              </div>
            </div>
 
            <div class="col s12 m4">
              <div class="icon-block">
-               <h2 class="center light-blue-text darken-4 "><i class="medium material-icons">import_export</i></h2>
-               <h5 class="center font">Servicio REST</h5>
+               <h2 class="center light-blue-text darken-4 "><i class="medium material-icons">library_books</i></h2>
+               <h5 class="center font">Almacén de Emailers</h5>
 
-               <p class="light">El servicio alojado en <b> http://localhost:8000/serviceEmail </b> y requiere de una petición POST con los siguientes parámetros:</p>
-                 <div class="chip">Id</div> Identificador del emailer. REQUERIDO<br>
-                 <div class="chip">To</div> Email para enviar el correo. REQUERIDO<br>
-                 <div class="chip">CC</div> Email para enviar copia. OPCIONAL<br>
-                 <div class="chip">CCO</div> Email para enviar copia oculta. OPCIONAL<br>
-                 <div class="chip">Subject</div> Asunto del correo. REQUERIDO<br>
-                 <div class="chip">Params</div> Parámetros del emailer. REQUERIDO
+               <p class="light"> Aquí podrás ver todos los emailers guardados. Podrás revisar cada uno, actualizarlo, eliminarlo e incluso podrás enviarte un preview.
+               <ul>
+                 <li><br><i class="small material-icons">mode_edit</i> Edita</li>
+                 <li><br><i class="small material-icons">visibility</i> Mira un preview</li>
+                 <li><br><i class="small material-icons">delete</i> Elimina</li>
+                 <li><br><i class="small material-icons">email</i> Envía una prueba</li>
+               </ul>
+               </p>
                </div>
            </div>
 
            <div class="col s12 m4">
              <div class="icon-block">
                <h2 class="center blue-text darken-4"><i class="medium material-icons">http</i></h2>
-               <h5 class="center font">Status</h5>
+               <h5 class="center font">Servicio Web</h5>
 
-               <p class="light">El servicio puede responder a las peticiones los siguientes mensajes, dependiendo el caso:</p>
-                 <div class="chip">201</div>Solicitud exitosa: "Solicitud enviada correctamente"<br>
-                 <div class="chip">400</div>Solicitud sin parámetros: "I can't do my job, please send me something please"<br>
-                 <div class="chip">400</div>Solicitud sin los parámetros necesarios: "I can't do my job. You have the follow errors"<br>
+               <p class="light"> El emailer tendrá un <b>ID</b> que servirá para conectar con el servicio API y poder conectarlo a otra aplicación.
+               </p>
+
              </div>
            </div>
          </div>

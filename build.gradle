@@ -27,6 +27,7 @@ dependencies {
   compile "io.vertx:vertx-mongo-client:${vertxVersion}"
   compile "io.vertx:vertx-mail-client:${vertxVersion}"
   compile "io.vertx:vertx-auth-shiro:${vertxVersion}"
+  compile 'io.vertx:vertx-auth-mongo:3.3.3'
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.21'
   testCompile "io.vertx:vertx-unit:${vertxVersion}"
   testCompile "junit:junit:4.12"

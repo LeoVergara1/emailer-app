@@ -6,6 +6,7 @@ import io.vertx.groovy.ext.web.handler.BodyHandler
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.groovy.core.Vertx
+import io.vertx.core.http.HttpHeaders
 import io.vertx.groovy.ext.web.handler.sockjs.SockJSHandler
 import io.vertx.groovy.ext.web.handler.StaticHandler
 import io.vertx.groovy.ext.web.handler.CookieHandler
@@ -16,8 +17,13 @@ import io.vertx.groovy.ext.web.handler.FormLoginHandler
 import io.vertx.groovy.ext.web.sstore.LocalSessionStore
 import io.vertx.ext.auth.shiro.ShiroAuthRealmType
 import io.vertx.groovy.ext.auth.shiro.ShiroAuth
+import io.vertx.groovy.ext.mongo.MongoClient
+import io.vertx.groovy.ext.auth.mongo.MongoAuth
 
 def config = Vertx.currentContext().config()
+
+//Configuration of Mongo
+def mongoClient = MongoClient.createShared(vertx, config.mongo)
 
 //configuracion externalizada
 options = [ "config":config ]
@@ -42,7 +48,15 @@ router.route().handler(CookieHandler.create())
 router.route().handler(BodyHandler.create())
 router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)))
 
-def authProvider = ShiroAuth.create(vertx, ShiroAuthRealmType.PROPERTIES, [:])
+//def authProvider = ShiroAuth.create(vertx, ShiroAuthRealmType.PROPERTIES, [:])
+def authProvider = MongoAuth.create(mongoClient, [:])
+
+/*
+authProvider.insertUser("username","password", [],[]){ res ->
+  println "*"*100
+  println res.dump()
+}
+*/
 
 router.route().handler(UserSessionHandler.create(authProvider))
 
@@ -218,35 +232,82 @@ router.post("/send").handler { routingContext ->
 
 //Route para el servicio Web
 router.post("/serviceEmail").handler { routingContext ->
-  if(routingContext.getBody().length()){
-    def jsonResponse=routingContext.getBodyAsJson()
-    vertx.eventBus().send("com.makingdevs.emailer.check", jsonResponse){ reply ->
-      def status = 0
-      def response = [:]
 
-      if(reply.result.body() == "ok" ){
-        status = 200
-        vertx.eventBus().send("com.makingdevs.emailer.service", jsonResponse)
-        response.message = "Solicitud enviada correctamente."
-      }else{
-        status = 400
-        response.message = "I can't do my job. You have the follow errors"
-        response.errors = reply.result().body()
-      }
+  def authHeader = routingContext.request().getHeader("Authorization")
 
-      routingContext.response()
-      .setStatusCode(status)
-      .putHeader("Content-Type", "application/json; charset=utf-8")
-      .end(Json.encodePrettily(response))
-    }
-  } else {
-    //response
+  if (!authHeader){
     routingContext.response()
-    .setStatusCode(400)
-    .putHeader("content-type", "application/json; charset=utf-8")
-    .end(Json.encodePrettily([
-      message:"I can't do my job, please send me something please."
-    ]))
+      .setStatusCode(400)
+      .putHeader("content-type", "application/json; charset=utf-8")
+      .end(Json.encodePrettily([
+        message:"Please login first. You have to include your username and password at Authentification Header"
+      ]))
+  }
+  else{
+
+  vertx.eventBus().send("com.makingdevs.emailer.decode", authHeader){ auth ->
+
+  def arguments = auth.result().body()
+
+  def authInfo = [
+    username:arguments.username,
+    password:arguments.password
+   ]
+
+  //Creando Sesión
+  authProvider.authenticate(authInfo, { res ->
+    if (!res.failed()) {
+      routingContext.setUser(res.result())
+      def emailerParams=[
+        id:arguments.id,
+        to:arguments.to,
+        subject:arguments.subject,
+        params:arguments.params
+      ]
+
+      if(routingContext.getBody().length()){
+        def jsonResponse=routingContext.getBodyAsJson()
+        vertx.eventBus().send("com.makingdevs.emailer.check", jsonResponse){ reply ->
+        def status = 0
+        def response = [:]
+
+        if(reply.result.body() == "ok" ){
+          status = 200
+          vertx.eventBus().send("com.makingdevs.emailer.service", jsonResponse)
+          response.message = "Request sent successfully"
+        }
+        else{
+          status = 400
+          response.message = "I can't do my job. You have the follow errors"
+          response.errors = reply.result().body()
+        }
+
+        routingContext.response()
+        .setStatusCode(status)
+        .putHeader("Content-Type", "application/json; charset=utf-8")
+        .end(Json.encodePrettily(response))
+        }
+     }
+    else {
+    //response
+      routingContext.response()
+      .setStatusCode(400)
+      .putHeader("content-type", "application/json; charset=utf-8")
+      .end(Json.encodePrettily([
+        message:"Please send arguments to Emailer Service"
+        ]))
+    }
+    }
+    else{
+      routingContext.response()
+      .setStatusCode(400)
+      .putHeader("content-type", "application/json; charset=utf-8")
+      .end(Json.encodePrettily([
+        message:"Please login with correct username and valid password."
+      ]))
+     }
+    })
+   }
   }
 }
 
