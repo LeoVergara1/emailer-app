@@ -15,8 +15,6 @@ import io.vertx.groovy.ext.web.handler.UserSessionHandler
 import io.vertx.groovy.ext.web.handler.RedirectAuthHandler
 import io.vertx.groovy.ext.web.handler.FormLoginHandler
 import io.vertx.groovy.ext.web.sstore.LocalSessionStore
-import io.vertx.ext.auth.shiro.ShiroAuthRealmType
-import io.vertx.groovy.ext.auth.shiro.ShiroAuth
 import io.vertx.groovy.ext.mongo.MongoClient
 import io.vertx.groovy.ext.auth.mongo.MongoAuth
 
